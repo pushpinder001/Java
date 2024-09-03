@@ -3,6 +3,8 @@ package collection.learning;
 import java.util.*;
 
 public class SetLearning {
+    record Booked(Integer id, Boolean isBooked) { }
+
     public static void main(String[] args) {
         //Set Learning first, last, pollFirst, pollLast
         NavigableSet<String> set = new TreeSet<>(List.of("BHey", "ZMy", "AName", "KIs", "Pushpinder"));
@@ -23,7 +25,7 @@ public class SetLearning {
 
         //Set Learning floor, ceil, lower, high
         String floor = set.floor("KIs");
-        String ceil = set.floor("KIs");
+        String ceil = set.ceiling("KIs");
 
         System.out.printf("Sets element KIs floor [%s] ceil [%s] and set %s%n", floor, ceil, set);
 
@@ -64,6 +66,38 @@ public class SetLearning {
         NavigableSet<Integer> subset = s1UnionS2.subSet(3, true, 8, true);
         System.out.printf("Subset %s%n", subset);
 
-        
+        List<Booked> bookingList = List.of(new Booked(1, true),
+                new Booked(2, true), new Booked(3, true), new Booked(4, false), new Booked(5, false));
+        NavigableSet<Booked> nSet = new TreeSet<>(Comparator.comparing(Booked::hashCode));
+        nSet.addAll(bookingList);
+
+        Set<Booked> maxTrueSet = returnMaxTrueBoolSubset(nSet);
+        System.out.println("Max True Set" + maxTrueSet);
+    }
+
+
+    public static Set<Booked> returnMaxTrueBoolSubset(NavigableSet<Booked> navigableSet) {
+        int curMaxLen=0;
+        Booked head=null;
+        Set<Booked> result = Set.of();
+
+        for(var it : navigableSet) {
+            if(!it.isBooked) { // Boolean value is false
+                head = null;
+                curMaxLen=0;
+                continue;
+            }
+
+            if(head == null) {
+                head = it;
+            }
+
+            curMaxLen++;
+            if(curMaxLen > result.size()) {
+                result = navigableSet.subSet(head, true, it, true);
+            }
+        }
+
+        return result;
     }
 }
